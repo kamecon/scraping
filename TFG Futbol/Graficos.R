@@ -6,89 +6,7 @@ pacman::p_load(tidyverse, xlsx, readr,readxl,
 liga <- read.csv('ligas2.csv') %>% 
   transform(clubes = as.character(clubes)) %>%
   transform(clubes = iconv(clubes, to='UTF-8')) %>% #Para poder hacer el join con derechosTV y reconozca acentos
-  as_tibble() #%>% 
-#  transform(clubes = str_trim(clubes))
-
-#Cálculo de los equipos por percentiles
-
-top84 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil84 = quantile(valorMercado, 0.84)) %>%
-  filter(valorMercado >= cuartil84) %>% 
-  summarise(media = mean(valorMercado)) %>% 
-  arrange(desc(media)) %>% 
-  as.data.frame()
-write.xlsx(top84, 'Top84.xlsx', row.names = FALSE)
-
-top85 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil85 = quantile(valorMercado, 0.85)) %>%
-  filter(valorMercado >= cuartil85) %>% 
-  summarise(media = mean(valorMercado)) %>% 
-  arrange(desc(media))%>% 
-  as.data.frame()
-write.xlsx(top85, 'Top85.xlsx', row.names = FALSE)
-
-top80 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil80 = quantile(valorMercado, 0.8)) %>%
-  filter(valorMercado >= cuartil80) %>% 
-  summarise(media = mean(valorMercado)) %>% 
-  arrange(desc(media))%>% 
-  as.data.frame()
-write.xlsx(top80, 'Top80.xlsx', row.names = FALSE)
-
-
-notop84 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil84 = quantile(valorMercado, 0.84)) %>%
-  filter(valorMercado <= cuartil84) %>% 
-  summarise(media = mean(valorMercado)) %>% 
-  arrange(desc(media))%>% 
-  as.data.frame()
-write.xlsx(notop84, 'NoTop84.xlsx', row.names = FALSE)
-
-notop85 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil85 = quantile(valorMercado, 0.85)) %>%
-  filter(valorMercado <= cuartil85) %>% 
-  summarise(media = mean(valorMercado)) %>% 
-  arrange(desc(media))%>% 
-  as.data.frame()
-write.xlsx(notop85, 'NoTop85.xlsx', row.names = FALSE)
-
-equiposTop84 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil84 = quantile(valorMercado, 0.84)) %>%
-  filter(valorMercado >= cuartil84) %>% 
-  select(clubes, valorMercado, Liga)%>% 
-  as.data.frame()
-write.xlsx(equiposTop84, 'TeamsTop84.xlsx', row.names = FALSE)
-
-equiposTop85 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil85 = quantile(valorMercado, 0.85)) %>%
-  filter(valorMercado >= cuartil85) %>% 
-  select(clubes, valorMercado, Liga)%>% 
-  as.data.frame()
-write.xlsx(equiposTop85, 'TeamsTop85.xlsx', row.names = FALSE)
-
-equiposTop80 <- liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil80 = quantile(valorMercado, 0.80)) %>%
-  filter(valorMercado >= cuartil80) %>% 
-  select(clubes, valorMercado, Liga) %>% 
-  as.data.frame()
-write.xlsx(equiposTop80, 'TeamsTop80.xlsx', row.names = FALSE)
-
-low45 <-  liga %>%
-  group_by(Liga) %>%
-  mutate(cuartil45 = quantile(valorMercado, 0.45)) %>%
-  filter(valorMercado <= cuartil45) %>% 
-  summarise(media = mean(valorMercado)) %>% 
-  arrange(desc(media))%>% 
-  as.data.frame()
-write.xlsx(low45, 'Pobres.xlsx', row.names = FALSE)
+  as_tibble() 
 
 
 #Boxplot
@@ -131,22 +49,6 @@ TVInglaterra <- read_excel("TVInglaterra.xlsx", col_names = c('clubes','derechos
                            col_types = c('text', 'numeric')) %>%
   slice(1:20)
 
-
-
-mediaSpain2 <- TVSpain %>% 
-  filter(str_detect(clubes,'Alav') | str_detect(clubes,'Lega') | str_detect(clubes,'Osasu')) %>% 
-  summarise(media = mean(derechosTV))
-mediaSpain2
-
-mediaFra2 <- TVFrancia %>% 
-  filter(str_detect(clubes,'Nancy') | str_detect(clubes,'Dijon') | str_detect(clubes,'Metz')) %>% 
-  summarise(media = mean(derechosTV))
-mediaFra2
-
-mediaIta2 <- TVItalia %>% 
-  filter(str_detect(clubes,'Carpi') | str_detect(clubes,'Frosinone') | str_detect(clubes,'Bologna')) %>% 
-  summarise(media = mean(derechosTV))
-mediaIta2
 
 
 derechosTV <- bind_rows(TVSpain,TVInglaterra,TVItalia,TVFrancia,TVAlemania)
