@@ -1,5 +1,4 @@
-pacman::p_load(tidyverse, xlsx, readr,readxl,
-                broom, stringr)
+pacman::p_load(tidyverse, xlsx, readr,readxl, ggrepel, broom, stringr)
 
 #setwd('')
 
