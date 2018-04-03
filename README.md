@@ -12,4 +12,8 @@ Esta compuesta por dos archivos: `scrapWeb.R` que realiza el scrap y `Graficos.R
 
 Asimismo 5 archivos excel con datos de los derechos de televisión por liga.
 
+### R Cheatsheets
+
+Código que descarga los cheat sheets de R studio `ScrapSheets.R`. Algo antiguo, habría que revisarlo
+
 
