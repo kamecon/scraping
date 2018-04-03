@@ -13,8 +13,8 @@ pacman::p_load(rvest, XML)
 
 url.macro <- "https://www.rstudio.com/resources/cheatsheets/"
 tmp <- read_html(url.macro)
-#Defino la ruta de descarga
-download.folder = 'c:/Users/Kamal/Documents/R/Cheat_sheets/'
+#Defino la ruta de descarga (modificar a su gusto)
+download.folder = '~/Cheat_sheets/'
 docu <- xmlParse(tmp)
 #Buscar los href
 docu.links <- xpathSApply(docu, "//a/@href")
