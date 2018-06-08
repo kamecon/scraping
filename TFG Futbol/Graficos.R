@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse, xlsx, readr,readxl, ggrepel, broom, stringr)
+pacman::p_load(tidyverse, xlsx, readr,readxl, ggrepel, broom, stringr, treemap)
 
 #setwd('')
 
@@ -149,3 +149,19 @@ l2g <- ggplot(liga2, aes(x=valorMercado, y=derechosTV)) +
   facet_wrap(~Liga, scales = 'free')
 l2g
 ggsave('dispersionLiga3.jpg')
+
+# Treemaps por liga 
+
+for (liga in unique(liga2$Liga)) {
+  png(filename = paste0(liga,"VTree.png"))
+  liga2 %>%
+    filter(Liga==liga) %>%
+    treemap(liga2, index = "clubes", vSize = "valorMercado", title = paste0("Valor de Mercado: ", liga))
+  dev.off()
+  png(filename = paste0(liga,"DTree.png"))
+  liga2 %>%
+    filter(Liga==liga) %>%
+    treemap(liga2, index = "clubes", vSize = "derechosTV", title = paste0("Derechos de Televisión: ", liga))
+  dev.off()
+}
+
