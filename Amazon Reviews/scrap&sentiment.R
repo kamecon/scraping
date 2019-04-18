@@ -45,8 +45,7 @@ for(page_num in 1:pages){
   reviews <- amazon_scraper(doc, reviewer = F, delay = 2)
   reviews_all <- rbind(reviews_all, cbind(producto, reviews))
   
-  #TablasAsin[[prod_code]] <- reviews_all
-  }
+}
 
 return(reviews_all)
 
@@ -152,7 +151,7 @@ filtro_focos <- review_focos %>%
   dplyr::arrange(desc(media_star)) 
 
 
-#Creamos una funcion que tome la tabla original y filtrada de los productos y sus comentarios y ratings (estrellas) y haga un analisis de sentimiento a los comentarios de cada uno de los productos. Finalmente calcula la media del sentimiento 
+#Tomamos la tabla original y filtrada de los productos y sus comentarios y ratings (estrellas) y hacemos un analisis de sentimiento a los comentarios de cada uno de los productos. Finalmente calcula la media del sentimiento 
 
 
 
