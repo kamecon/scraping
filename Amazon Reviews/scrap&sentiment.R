@@ -88,12 +88,12 @@ tabla_sentimiento <- function(tablaFiltro,tabla){
   #   vector con media de sentimientos por producto
   
   a  <- list()
-  a <- purrr::map(xx$producto %>% as.vector(),
-                  function(x) with(yy[[x]], sentiment_by(comments)) %>%
+  a <- purrr::map(tablaFiltro$producto %>% as.vector(),
+                  function(x) with(tabla[[x]], sentiment_by(comments)) %>%
                     dplyr::summarise(media_sentimiento=mean(ave_sentiment))
   )
   
-  names(a) <- yy$producto %>% as.vector()
+  names(a) <- tabla$producto %>% as.vector()
   
   return(a)
   
