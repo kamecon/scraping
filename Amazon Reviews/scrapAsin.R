@@ -1,3 +1,6 @@
+if(!"pacman" %in% installed.packages()[,"Package"]) install.packages("pacman")
+pacman::p_load(XML, dplyr, purrr, stringr, rvest, audio)
+
 url <- "https://www.amazon.com/s?k=GARDEN&i=tools-intl-ship&bbn=256643011&rh=n%3A256643011%2Cn%3A468240%2Cn%3A495224%2Cn%3A495236%2Cn%3A495238&dc&page=2&__mk_es_US=%C3%85M%C3%85%C5%BD%C3%95%C3%91&qid=1551714309&rnid=495236&ref=sr_pg_2"
 
 
@@ -5,7 +8,7 @@ doc <- read_html(url)
 numero <- doc %>%
   html_nodes(".s-precache-url , .a-disabled") %>%
   html_text()
-#paginas <- numero[3] %>%
+
 paginas <- numero %>%
   tail(1) %>%
   as.numeric()
@@ -15,6 +18,7 @@ lista <- vector()
 for (pagina in 1:paginas) {
   locprov <- str_locate(string = url, pattern = "page=")
   locprov2 <- locprov[2]
+  #Hacemos esto para evitar errores cuando el numero de pagina tiene mas de 2 digitos
   if (pagina <=10) {
     str_sub(url, (locprov2+1),(locprov2+1)) <- as.character(pagina)
   } else {
@@ -39,7 +43,8 @@ listaAsin <- lista %>%
                substr(1,10) %>% #nos quedamos con las 10 primeros string
                unlist() %>% #convertimos en vector
                as.vector()  
-             )
+             )%>% 
+  unlist()
 
 #Se hace algo similar pero más sencillo para hacer un vector de nombre de los articulos
 listaArt <- lista %>%
