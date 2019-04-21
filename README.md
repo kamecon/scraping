@@ -20,7 +20,7 @@ De momento está compuesta por dos archivos: `scrapAsin.R` que para una categoría
 El archivo `scrap&sentiment.R` toma las tablas generadas en el script anterior con las listas de asines y productos, las une en una sola tabla, y construye mediante un scraping una tabla por producto con los comentarios del mismo, la fecha, la valoracion (estrellas), el formato de producto y si el comentarista es un cliente vine o normal.
 Posteriormente se hace un analisis de sentimiento a los comentarios de cada uno de los productos. Finalmente calcula la media del sentimiento por producto
 
-Gran parte del análisis está basado en este [post](https://justrthings.com/2016/08/17/web-scraping-and-sentiment-analysis-of-amazon-reviews/) escrito por [Riki Saito](https://github.com/rjsaito)
+Gran parte del análisis está basado en este [post](https://justrthings.com/2016/08/17/web-scraping-and-sentiment-analysis-of-amazon-reviews/) escrito por [Riki Saito](https://github.com/rjsaito). La versión original de `amazon_scraper` se encuentra [acá](https://raw.githubusercontent.com/rjsaito/Just-R-Things/master/Text%20Mining/amazonscraper.R)
 
 ### R Cheatsheets
 
