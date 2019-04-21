@@ -12,15 +12,6 @@ amazon_scraper <- function(doc, reviewer = T, delay = 0){
   #Remove all white space
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
   
-  # title <- doc %>%
-  #   html_nodes("#cm_cr-review_list .a-color-base") %>%
-  #   html_text()
-  # 
-  # author <- doc %>%
-  #   #html_nodes(".review-byline .author") %>% 
-  #   html_nodes(".a-profile-name")%>%
-  #   html_text()
-  # author <- author[3:10] #hacemos esto porque Amazon coloca 2 top reviews antes de los reviews
   
   date <- doc %>%
     html_nodes("#cm_cr-review_list .review-date") %>%
@@ -57,10 +48,7 @@ amazon_scraper <- function(doc, reviewer = T, delay = 0){
     gsub("One", "1", .) %>%
     as.numeric()
   
-  # merchant_info <- doc %>%
-  #   html_nodes("#merchant-info") %>%
-  #   html_text() 
-  
+
   if(reviewer == T){
     
     rver_url <- doc %>%
@@ -109,8 +97,7 @@ amazon_scraper <- function(doc, reviewer = T, delay = 0){
     df <- data.frame(title, date, ver.purchase, format, stars, comments, helpful,
                      rver_url, rver_avgrating_10, rver_numrev, rver_numhelpful, rver_rank, stringsAsFactors = F)
     
-  } else #df <- data.frame(title, author, date, ver.purchase, format, stars, comments, helpful, stringsAsFactors = F)
-  #df <- data.frame(title, author, date, ver.purchase, format, stars, comments,  stringsAsFactors = F)
+  } else 
     df <- data.frame(date, ver.purchase, format, stars, comments,  stringsAsFactors = F)
   return(df)
 }
