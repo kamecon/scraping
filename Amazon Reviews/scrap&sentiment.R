@@ -1,7 +1,7 @@
 ###Carga de paquetes ----
 
 if(!"pacman" %in% installed.packages()[,"Package"]) install.packages("pacman")
-pacman::p_load(tidyverse, miceadds, xlsx)
+pacman::p_load(tidyverse, miceadds, xlsx, tidytext, plyr)
 pacman::p_load_gh("trinker/sentimentr")
 
 
@@ -100,6 +100,76 @@ tabla_sentimiento <- function(tablaFiltro,tabla){
 }
 
 
+sentimiento_bing <- function(lista){
+  # Convierte la lista de productos con sus respectivos comentarios
+  # y demas informacion en una tabla con los productos y su correspondiente 
+  # polaridad de sentimiento.
+  # En esta funcion se calcula la polaridad usando el lexicon BING
+  # de la libreria tidytext. En dicho lexicon se clasifican las 
+  # palabras en "positivas" o "negativas", se calcula la polaridad
+  # como la suma de las palabras positivas menos las negativas.
+  # Se calcula la polaridad de cada producto como la suma de las
+  # polaridades de cada uno de sus comentarios.
+  # Requiere las librerias tidyverse, tidytext y plyr
+  
+  # Args:
+  #   lista: lista generada por la funcion `scrapeAsin`
+  #
+  # Returns:
+  #   Una tabla don dos columnas: una para el nombre del producto
+  #   y otra con su polaridad
+  
+  #Quitamos los elementos NULL de la lista (productos que no tienen comentarios)
+  lista_filtrada <- plyr::compact(lista)
+  
+  #Creamos un vector con los nombres de los productos filtrados
+  pdcto <- names(lista_filtrada)
+  
+  #Lista vacia para rellenar en el map
+  prueba_tokens <- list()
+  
+  ## Se explica lo que se hace a continuación en cada linea de la funcion qeu se aplica en el map:
+  # 1- convertimos en tibble para poder pasarle el unnest_tokens
+  # 2- colocamos el indice como una columna aparte para saber a que comentario pertencen los tokens
+  # 3- quitamos los stop words
+  # 4- hacemos el inner join con el lexicon para saber que palabras positivas y negativas hay en el comentario
+  # 5- contamos los sentimientos por comentario (nº de palabaras positivas o negativas)
+  # 6- Se ha incluido esto y la linea posterior como solucion a este problema https://es.stackoverflow.com/questions/256001/generalizar-suma-de-columnas-con-mutate-para-frames-de-distintas-dimensiones
+  # 7- lo colocamos en formato wide para que quede una columna por comentario negativo o positivo
+  # 8- se calcula la polaridad como la diferencia entre comentarios positivos y negativos
+  # 9- se calcula la polaridad "media" como la suma de la polaridad de los comentarios 
+  
+  prueba_tokens <- purrr::map(pdcto,
+                              function(x) lista_filtrada[[x]]$comments %>%
+                                as_tibble() %>%
+                                rownames_to_column() %>%
+                                unnest_tokens(word, value) %>%
+                                anti_join(stop_words, by="word") %>%
+                                inner_join(get_sentiments("bing"), by="word") %>%
+                                count(sentiment, rowname) %>%
+                                mutate(sentiment = factor(sentiment, levels = c("positive", "negative"))) %>%
+                                spread(sentiment,n,fill = 0, drop = FALSE) %>%
+                                mutate(polaridad=positive-negative) %>%
+                                dplyr::summarise(ave_sentimiento=sum(polaridad))
+                              
+  )
+  
+  #Como la lista resultante no tiene nombres, le asignamos el nombre de cada producto
+  names(prueba_tokens) <- pdcto
+  
+  #Convertimos la lista en un tibble donde la 1º columna es el nombre del producto y la 2º la polaridad
+  sentimiento_medio <-  prueba_tokens %>%
+    unlist %>%
+    as.tibble() %>%
+    mutate(producto=names(prueba_tokens)) %>%
+    select(2:1) %>% 
+    dplyr::rename(sentimientoBING = value)
+  
+  return(sentimiento_medio)
+  
+}
+
+
 ###Tabla de productos ----
 
 #Se construye una tabla para cada producto con los comentarios del mismo, la fecha, la valoracion (estrellas), el formato de producto y si el comentarista es un cliente vine o normal
@@ -153,9 +223,18 @@ filtro_focos <- review_focos %>%
 
 #Tomamos la tabla original y filtrada de los productos y sus comentarios y ratings (estrellas) y hacemos un analisis de sentimiento a los comentarios de cada uno de los productos. Finalmente calcula la media del sentimiento 
 
-
-
 filtro_focos$sentimiento <- tabla_sentimiento(filtro_focos, review_focos) %>%
   unlist() %>%
   as.vector()
+
+#Ahora hacemos un analisis de sentimiento basado en unigramas (palabras) con el lexicon BING, para eso usamos la funcion sentimiento_bing
+
+sentimentBING_focos <- sentimiento_bing(review_focos)
+
+#Juntamos con la tabla de sentimientos anterior para comparar
+
+filtro_focos_BING <- inner_join(sentimentBING_focos,filtro_focos, by="producto") %>%
+  dplyr::select(-numero_comments) %>%
+  dplyr::arrange(desc(media_star)) %>% 
+  dplyr::select(1,3:4,2)
 
